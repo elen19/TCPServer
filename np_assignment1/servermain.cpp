@@ -77,4 +77,31 @@ int main(int argc, char *argv[]){
         }
         break;
     }
+
+    freeaddrinfo(serverInfo); //Rensar serverInfo, bra safety
+
+    while (true)
+    {
+        memset(clientMsg, 0, sizeof(clientMsg));
+        memset(finalMsg, 0, sizeof(finalMsg));
+
+        if (listen(sockFD, 1) == -1)
+        {
+            printf("No one is listening \nError: %s", strerror(errno));
+            close(sockFD);
+            exit(0);
+        }
+        else
+        {
+            printf("Listening on 127.0.0.1:%s\n", argv[1]);
+        }
+
+        if ((listenFD = accept(sockFD, (struct sockaddr*) & clientAddr, &clientAddr_len))== -1)
+        {
+            printf("Error accepting: %s \n", strerror(errno));
+            continue;
+        }
+        printf("CLIENT CONNECTED!!\n");
+
+    }
 }
