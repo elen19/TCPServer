@@ -42,5 +42,39 @@ int main(int argc, char *argv[]){
     double clientResult;
 
     struct sockaddr_in clientAddr;
-    socklen_t clientAddr_len = sizeOf(clientResult);
+    socklen_t clientAddr_len = sizeof(clientResult);
+
+    char finalMsg[80];
+    char protocol[15] = "Text TCP 1.0\n";
+
+    char clientMsg[100];  
+    int clientMsgLen = sizeof(clientMsg);
+
+    memset(&guide, 0, sizeof(guide));
+
+    guide.ai_family = AI_INET;
+    guide.ai_sockettype = SOCK_STREAM;
+    guide.ai_flags = AI_PASSIVE;
+
+    if ((returnValue = getaddrinfo(NULL, argv[1], &guide, &serverInfo)) != 0)
+    {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(returnValue));
+        exit(0);
+    }
+
+    for (p = serverInfo; p != NULL; p = p->ai_next)
+    {
+        if ((sockFD = socket(p->ai_family, p->ai_socktype,
+            p->ai_protocol)) == -1)
+        {
+            printf("listener: socket: %s\n", gai_strerror(errno));
+            continue;
+        }
+        if (bind(sockFD, p->ai_addr, p->ai_addrlen) == -1) {
+            close(sockFD);
+            printf("listener error: bind: %s\n", gai_strerror(errno));
+            continue;
+        }
+        break;
+    }
 }
