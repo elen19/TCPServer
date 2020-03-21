@@ -77,6 +77,10 @@ int main(int argc, char *argv[]){
         }
         break;
     }
+    if (sockFD == -1)
+    {
+        printf("Failed to creat socket\n");
+    }
 
     freeaddrinfo(serverInfo); //Rensar serverInfo, bra safety
 
@@ -101,7 +105,56 @@ int main(int argc, char *argv[]){
             printf("Error accepting: %s \n", strerror(errno));
             continue;
         }
-        printf("CLIENT CONNECTED!!\n");
+        printf("CLIENT CONNECTED!!\n Checking protocol\n");
+
+        send(listenFD, protocol, strlen(protocol), 0);
+
+        numBytes = recv(listenFD, clientMsg, clientMsgLen, 0);
+        printf("Recieved %d bytes\n", numBytes);
+        //Se till att clienten säger att det är "OK"
+        if (strcmp(clientMsg, "OK\n") == 0)
+        {
+            printf("OK from client");
+            
+            char* oper = randomType();
+
+            if (strchr(oper, 'f') != null)
+            {
+                //Här genereras floats
+                for (int i = 0; i < 2; i++)
+                {
+                    fval[i] = randomFloat();
+                    printf("[x]Value %d: %8.8g\n", i + 1, fval[i]);
+
+                }
+
+                sprintf(calcMsgFinal, "%s %8.8g %8.8g\n", oper, fval[0], fval[1]);
+                //Här kollar vi vilken operand vi jobbar med, skriver ut den
+                //och beräknar resultatet				
+                if (strcmp(oper, "fadd") == 0)
+                {
+                    printf("Operation: Addition\n");
+                    result = fval[0] + fval[1];
+                }
+                else if (strcmp(oper, "fsub") == 0)
+                {
+                    printf("Operation: Subraction\n");
+                    result = fval[0] - fval[1];
+                }
+                else if (strcmp(oper, "fmul") == 0)
+                {
+                    printf("Operation: Multiplication\n");
+                    result = fval[0] * fval[1];
+                }
+                else if (strcmp(oper, "fdiv") == 0)
+                {
+                    printf("Operation: Division\n");
+                    result = fval[0] / fval[1];
+                }
+            }
+
+        }
 
     }
+
 }
